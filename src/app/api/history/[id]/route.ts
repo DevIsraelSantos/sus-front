@@ -4,13 +4,13 @@ import { NextResponse } from "next/server"
 let history = [
   {
     id: "1",
-    fileName: "dados1.csv",
+    fileName: "dados1.dbf",
     date: "2023-05-15T10:30:00Z",
     status: "success",
   },
   {
     id: "2",
-    fileName: "dados2.json",
+    fileName: "dados2.dbf",
     date: "2023-05-16T14:45:00Z",
     status: "error",
     errorMessage: "Formato inválido",

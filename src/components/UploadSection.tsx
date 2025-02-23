@@ -20,8 +20,7 @@ export default function UploadSection() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'application/json': ['.json'],
-      'text/csv': ['.csv'],
+      'application/dbf': ['.dbf'],
     },
     maxFiles: 1,
   });
@@ -33,16 +32,14 @@ export default function UploadSection() {
     formData.append('file', file);
 
     try {
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/uploadDbf', {
         method: 'POST',
         body: formData,
       });
 
       if (response.ok) {
-        // Atualizar o histórico ou mostrar uma notificação de sucesso
         console.log('Upload realizado com sucesso');
       } else {
-        // Mostrar uma notificação de erro
         console.error('Erro no upload');
       }
     } catch (error) {
@@ -55,7 +52,7 @@ export default function UploadSection() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">Upload de Arquivo</h2>
+      <h2 className="text-2xl font-semibold mb-4">Upload de Arquivo DBF</h2>
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
@@ -67,10 +64,10 @@ export default function UploadSection() {
         <input {...getInputProps()} />
         <Upload className="mx-auto h-12 w-12 text-gray-400" />
         <p className="mt-2 text-sm text-gray-600">
-          Arraste e solte um arquivo aqui, ou clique para selecionar
+          Arraste e solte um arquivo .DBF aqui, ou clique para selecionar
         </p>
         <p className="text-xs text-gray-500 mt-1">
-          Apenas arquivos .json e .csv são aceitos
+          Apenas arquivos .dbf são aceitos
         </p>
       </div>
       {isModalOpen && file && (
