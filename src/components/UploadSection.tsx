@@ -1,0 +1,88 @@
+'use client';
+
+import { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Upload } from 'lucide-react';
+import ConfirmationModal from './ConfirmationModal';
+
+export default function UploadSection() {
+  const [file, setFile] = useState<File | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const onDrop = (acceptedFiles: File[]) => {
+    console.log('Arquivos aceitos:', acceptedFiles);
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+      setIsModalOpen(true);
+    }
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'application/json': ['.json'],
+      'text/csv': ['.csv'],
+    },
+    maxFiles: 1,
+  });
+
+  const handleConfirmUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        // Atualizar o histórico ou mostrar uma notificação de sucesso
+        console.log('Upload realizado com sucesso');
+      } else {
+        // Mostrar uma notificação de erro
+        console.error('Erro no upload');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+    }
+
+    setIsModalOpen(false);
+    setFile(null);
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-4">Upload de Arquivo</h2>
+      <div
+        {...getRootProps()}
+        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+          isDragActive
+            ? 'border-blue-500 bg-blue-50'
+            : 'border-gray-300 hover:border-blue-500'
+        }`}
+      >
+        <input {...getInputProps()} />
+        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+        <p className="mt-2 text-sm text-gray-600">
+          Arraste e solte um arquivo aqui, ou clique para selecionar
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          Apenas arquivos .json e .csv são aceitos
+        </p>
+      </div>
+      {isModalOpen && file && (
+        <ConfirmationModal
+          file={file}
+          onConfirm={handleConfirmUpload}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setFile(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
