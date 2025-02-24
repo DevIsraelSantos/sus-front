@@ -67,7 +67,7 @@ export default function HistorySection() {
       case 'PENDING':
         return <Badge variant={'secondary'}>Pendente</Badge>;
       case 'IN_PROGRESS':
-        return <Badge variant={'default'}>Processando</Badge>;
+        return <Badge variant={'warning'}>Processando</Badge>;
     }
   }
 

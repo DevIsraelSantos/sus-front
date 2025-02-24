@@ -26,7 +26,7 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
       case 'ERROR':
         return <Badge variant={'destructive'}>Erro</Badge>;
       case 'WARNING':
-        return <Badge variant={'secondary'}>Pendente</Badge>;
+        return <Badge variant={'warning'}>Aviso</Badge>;
     }
   }
   function GetDate(input: Date) {
@@ -101,9 +101,9 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
                       >
                         <div className="flex flex-col">
                           <p className="text-base">{log.message}</p>
-                          <p className="text-sm">{GetDate(log.createdAt)}</p>
+                          <p className="text-xs">{GetDate(log.createdAt)}</p>
                         </div>
-                        <div className="flex items-center w-20 justify-center">
+                        <div className="flex items-center min-w-20 w-20 justify-center">
                           <ShowBadge status={log.type} />
                         </div>
                       </div>
