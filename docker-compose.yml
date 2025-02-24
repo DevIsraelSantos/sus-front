@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  file-watcher:
+    build: 
+      context: .
+      dockerfile: dockerfile-watcher
+    container_name: file-watcher
+    volumes:
+      - ./public/files:/app/files
+      - ./prisma/database:/app/prisma/database
+    working_dir: /app
+    command: ["python", "src_py/watcher.py"]
+    restart: always
+
