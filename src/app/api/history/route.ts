@@ -1,22 +1,6 @@
 import { prisma } from '@/prisma';
+import { LogType } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-// Simulação de um banco de dados
-const history = [
-  {
-    id: '1',
-    fileName: 'dados1.csv',
-    date: '2023-05-15T10:30:00Z',
-    status: 'success',
-  },
-  {
-    id: '2',
-    fileName: 'dados2.json',
-    date: '2023-05-16T14:45:00Z',
-    status: 'error',
-    errorMessage: 'Formato inválido',
-  },
-];
 
 export async function GET() {
   const files = await prisma.file.findMany({
@@ -36,11 +20,19 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const data = await request.json();
-  const newItem = {
-    id: Date.now().toString(),
-    ...data,
-  };
-  history.push(newItem);
-  return NextResponse.json(newItem);
+  const data: {
+    fileId: number;
+    message: string;
+    type: LogType;
+  } = await request.json();
+
+  const log = await prisma.logFile.create({
+    data: {
+      fileId: data.fileId,
+      message: data.message,
+      type: data.type,
+    },
+  });
+
+  return NextResponse.json(log);
 }

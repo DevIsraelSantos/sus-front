@@ -10,8 +10,22 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./public/files:/app/files
-      - ./prisma/database:/app/prisma/database
     working_dir: /app
     command: ["python", "src_py/watcher.py"]
     restart: always
+
+  portal-web:
+    build: 
+      context: .
+      dockerfile: dockerfile-portal
+    container_name: portal-web
+    volumes:
+      - ./public:/app/public
+      - ./prisma/database:/app/prisma/database
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    command: ["npm", "run", "start"]
+    restart: always
+    
 

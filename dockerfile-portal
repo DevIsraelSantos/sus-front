@@ -1,0 +1,22 @@
+# Usar a imagem oficial do Node.js
+FROM node:20
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de backend para o container
+COPY . .
+RUN rm -rf /app/src_py
+
+# Instalar dependências do Node.js
+RUN npm install
+
+# Gerar o cliente Prisma
+RUN npx prisma generate
+RUN npm run build
+
+# Expor a porta do servidor Node.js
+EXPOSE 80
+
+# Rodar o servidor
+CMD ["npm", "run", "start"]
