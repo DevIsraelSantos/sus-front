@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: dockerfile-watcher
     container_name: file-watcher
+    environment:
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./public/files:/app/files
       - ./prisma/database:/app/prisma/database
