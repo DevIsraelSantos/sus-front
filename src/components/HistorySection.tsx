@@ -12,7 +12,11 @@ export type HistoryType = File & {
   logs: LogFile[];
 };
 
-export default function HistorySection() {
+export default function HistorySection({
+  refetch,
+}: {
+  refetch: (fn: () => void) => void;
+}) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [history, setHistory] = useState<HistoryType[]>([]);
   const [selectedFile, setSelectedFile] = useState<HistoryType | undefined>(
@@ -21,6 +25,8 @@ export default function HistorySection() {
 
   useEffect(() => {
     fetchHistory();
+    refetch(fetchHistory);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchHistory = async () => {

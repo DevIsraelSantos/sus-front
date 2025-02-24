@@ -22,7 +22,7 @@ enum FileType {
 model File {
   id          Int       @id @default(autoincrement())
   type        FileType?
-  name        String
+  name        String    @unique
   currentPath String?
   status      Status    @default(PENDING)
   createdAt   DateTime  @default(now())

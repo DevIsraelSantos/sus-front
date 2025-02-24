@@ -1,6 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
+import { Fragment, useState } from 'react';
 import { Button } from './ui/button';
 
 interface ConfirmationModalProps {

@@ -5,15 +5,39 @@ import { useDropzone } from 'react-dropzone';
 import { Upload } from 'lucide-react';
 import ConfirmationModal from './ConfirmationModal';
 
-export default function UploadSection() {
+export default function UploadSection({
+  refreshHistory,
+}: {
+  refreshHistory: (() => void) | null;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  async function IsValidName(name: string): Promise<boolean> {
+    const response = await fetch(`api/history/${name}`, {
+      method: 'GET',
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      if (data.file) {
+        alert('Arquivo já existe');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   const onDrop = (acceptedFiles: File[]) => {
-    console.log('Arquivos aceitos:', acceptedFiles);
     if (acceptedFiles.length > 0) {
-      setFile(acceptedFiles[0]);
-      setIsModalOpen(true);
+      IsValidName(acceptedFiles[0].name).then((isValid) => {
+        if (isValid) {
+          setFile(acceptedFiles[0]);
+          setIsModalOpen(true);
+        }
+      });
     }
   };
 
@@ -36,6 +60,10 @@ export default function UploadSection() {
         method: 'POST',
         body: formData,
       });
+
+      if (refreshHistory) {
+        refreshHistory();
+      }
 
       if (response.ok) {
         console.log('Upload realizado com sucesso');

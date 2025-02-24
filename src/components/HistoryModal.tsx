@@ -15,10 +15,6 @@ interface HistoryModalProps {
 export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
   if (!file) return null;
 
-  file.logs.sort((a, b) => {
-    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-  });
-
   function ShowBadge({ status }: { status: LogType }) {
     switch (status) {
       case 'INFO':
