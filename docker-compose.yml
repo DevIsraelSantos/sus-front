@@ -13,6 +13,10 @@ services:
     working_dir: /app
     command: ["python", "src_py/watcher.py"]
     restart: always
+    depends_on:
+      - portal-web
+    networks:
+      - my-network
 
   portal-web:
     build: 
@@ -27,5 +31,9 @@ services:
     working_dir: /app
     command: ["npm", "run", "start"]
     restart: always
-    
+    networks:
+      - my-network
 
+networks:
+  my-network:
+    driver: bridge

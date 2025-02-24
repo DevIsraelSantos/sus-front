@@ -19,15 +19,17 @@ export async function POST(req: NextRequest) {
     const file = formData.get('file') as File;
 
     if (!file) {
-      return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Nenhum arquivo enviado' },
+        { status: 400 }
+      );
     }
-
 
     const fileinit = await prisma.file.create({
       data: {
         name: file.name,
-      }
-    })
+      },
+    });
 
     const logger = new Logger(fileinit.id);
     await logger.log(`Inicio do processamento do arquivo ${file.name}`);
@@ -43,12 +45,12 @@ export async function POST(req: NextRequest) {
     await fs.writeFile(tempFilePath, buffer);
     await prisma.file.update({
       where: {
-        id: fileinit.id
+        id: fileinit.id,
       },
       data: {
-        currentPath: tempFilePath
-      }
-    })
+        currentPath: tempFilePath,
+      },
+    });
     await logger.log('Arquivo salvo com sucesso');
 
     // Valida colunas do arquivo
@@ -57,32 +59,37 @@ export async function POST(req: NextRequest) {
     await logger.log('Arquivo DBF aberto com sucesso');
     const fieldsInfo = dbf.fields.map((field) => field.name.toLowerCase());
     const fileType = await ValidateColumnNames(fieldsInfo);
-    await logger.log(`O arquivo possui ${fieldsInfo.length} colunas. considerado ${fileType}`);
+    await logger.log(
+      `O arquivo possui ${fieldsInfo.length} colunas. considerado ${fileType}`
+    );
 
     if (fileType === 'ERRO') {
       await logger.log('Removendo arquivo temporário');
       await fs.rm(tempFilePath);
       await prisma.file.update({
         where: {
-          id: fileinit.id
+          id: fileinit.id,
         },
         data: {
           currentPath: null,
-          status: 'ERROR'
-        }
-      })
+          status: 'ERROR',
+        },
+      });
       await logger.warn('Arquivo removido com sucesso');
       await logger.error('Tipo de arquivo não reconhecido');
-      return NextResponse.json({ error: 'Tipo de arquivo não reconhecido, verifica as colunas' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Tipo de arquivo não reconhecido, verifica as colunas' },
+        { status: 400 }
+      );
     } else {
       await prisma.file.update({
         where: {
-          id: fileinit.id
+          id: fileinit.id,
         },
         data: {
-          type: fileType
-        }
-      })
+          type: fileType,
+        },
+      });
     }
     await logger.log(`Tipo de arquivo identificado: ${fileType}`);
 
@@ -95,21 +102,25 @@ export async function POST(req: NextRequest) {
     await fs.rename(tempFilePath, finalPath);
     await prisma.file.update({
       where: {
-        id: fileinit.id
+        id: fileinit.id,
       },
       data: {
-        currentPath: finalPath
-      }
-    })
-    await logger.log('Arquivo movido com sucesso');
+        currentPath: finalPath,
+      },
+    });
+    await logger.log('Arquivo aguardando processamento');
 
     return NextResponse.json(
       { message: `Arquivo salvo em /public/${finalPath}` },
       { status: 200 }
     );
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Erro desconhecido';
     console.log('Erro ao processar o arquivo:', errorMessage);
-    return NextResponse.json({ error: 'Erro ao processar o arquivo', details: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Erro ao processar o arquivo', details: errorMessage },
+      { status: 500 }
+    );
   }
 }

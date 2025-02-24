@@ -4,7 +4,7 @@ FROM node:20
 # Definir diretório de trabalho
 WORKDIR /app
 
-# Copiar arquivos de backend para o container
+# Copiar arquivos para o container
 COPY . .
 RUN rm -rf /app/src_py
 
@@ -15,8 +15,10 @@ RUN npm install
 RUN npx prisma generate
 RUN npm run build
 
+
+
 # Expor a porta do servidor Node.js
-EXPOSE 80
+EXPOSE 3000
 
 # Rodar o servidor
 CMD ["npm", "run", "start"]

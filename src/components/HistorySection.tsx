@@ -29,6 +29,20 @@ export default function HistorySection({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (
+        history.some(
+          (item) => item.status === 'PENDING' || item.status === 'IN_PROGRESS'
+        )
+      ) {
+        fetchHistory();
+      }
+    }, 10000); // Atualiza a cada 10 segundos
+
+    return () => clearInterval(interval);
+  }, [history]);
+
   const fetchHistory = async () => {
     try {
       setIsLoaded(true);

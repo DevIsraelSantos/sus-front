@@ -21,14 +21,44 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const data: {
-    fileId: number;
+    fileId: string;
     message: string;
     type: LogType;
   } = await request.json();
+  // INIT = Iniciando o processamento
+  // END = Processamento finalizado com sucesso
+
+  const id = Number(data.fileId);
+
+  if (data.message === 'INIT') {
+    await prisma.file.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'IN_PROGRESS',
+      },
+    });
+
+    data.message = 'Iniciando o processamento';
+  }
+
+  if (data.message === 'END') {
+    await prisma.file.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'SUCCESS',
+      },
+    });
+
+    data.message = 'Processamento finalizado com sucesso';
+  }
 
   const log = await prisma.logFile.create({
     data: {
-      fileId: data.fileId,
+      fileId: id,
       message: data.message,
       type: data.type,
     },
