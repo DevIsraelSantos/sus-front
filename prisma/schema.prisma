@@ -14,8 +14,14 @@ enum Status {
   ERROR
 }
 
+enum FileType {
+  PA
+  RD
+}
+
 model File {
   id          Int       @id @default(autoincrement())
+  type        FileType
   name        String
   currentPath String
   status      Status    @default(PENDING)

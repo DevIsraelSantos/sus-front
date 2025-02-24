@@ -90,7 +90,7 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
                 </Dialog.Title>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Criado em: {GetDate(file.createdAt)}. {file.name}
+                    Arquivo {file.type}. Nome: {file.name}
                   </p>
 
                   <ScrollArea className="space-y-4 my-1 max-h-96 overflow-y-auto">

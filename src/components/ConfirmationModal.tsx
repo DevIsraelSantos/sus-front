@@ -1,6 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { X } from 'lucide-react';
+import { Fragment, useState } from 'react';
+import { Loader2, X } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface ConfirmationModalProps {
   file: File;
@@ -13,6 +14,8 @@ export default function ConfirmationModal({
   onConfirm,
   onCancel,
 }: ConfirmationModalProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
     <Transition appear show={true} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onCancel}>
@@ -47,7 +50,9 @@ export default function ConfirmationModal({
                   Confirmar Upload
                   <button
                     onClick={onCancel}
-                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                    data-is-loading={isLoaded}
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none data-is-loading:cursor-not-allowed"
+                    disabled={isLoaded}
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -66,17 +71,24 @@ export default function ConfirmationModal({
                 </div>
 
                 <div className="mt-4 flex justify-end space-x-2">
-                  <button
+                  <Button
                     type="button"
                     className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={onConfirm}
+                    onClick={() => {
+                      setIsLoaded(true);
+                      onConfirm();
+                    }}
+                    disabled={isLoaded}
                   >
+                    {isLoaded && <Loader2 className="animate-spin" />}
                     Confirmar
-                  </button>
+                  </Button>
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+                    data-is-loading={isLoaded}
+                    className="data-is-loading:cursor-not-allowed inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
                     onClick={onCancel}
+                    disabled={isLoaded}
                   >
                     Cancelar
                   </button>
