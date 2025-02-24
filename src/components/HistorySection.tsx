@@ -1,17 +1,19 @@
 'use client';
 
 import { File, LogFile, Status } from '@prisma/client';
-import { Search } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import HistoryModal from './HistoryModal';
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 
 export type HistoryType = File & {
   logs: LogFile[];
 };
 
 export default function HistorySection() {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [history, setHistory] = useState<HistoryType[]>([]);
   const [selectedFile, setSelectedFile] = useState<HistoryType | undefined>(
     undefined
@@ -23,7 +25,10 @@ export default function HistorySection() {
 
   const fetchHistory = async () => {
     try {
+      setIsLoaded(true);
       const response = await fetch('/api/history');
+
+      setIsLoaded(false);
       if (response.ok) {
         const data: Array<HistoryType> = await response.json();
         setHistory(data);
@@ -69,7 +74,18 @@ export default function HistorySection() {
   return (
     <>
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold mb-4">Histórico de Uploads</h2>
+        <div className="inline-flex justify-between w-full">
+          <h2 className="text-2xl font-semibold mb-4">Histórico de Uploads</h2>
+          <Button
+            size={'sm'}
+            variant={'outline'}
+            onClick={fetchHistory}
+            disabled={isLoaded}
+          >
+            {isLoaded && <Loader2 className="animate-spin" />}
+            atualizar
+          </Button>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
