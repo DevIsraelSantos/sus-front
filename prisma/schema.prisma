@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  SUCCESS
+  ERROR
+}
+
+model File {
+  id          Int       @id @default(autoincrement())
+  name        String
+  currentPath String
+  status      Status    @default(PENDING)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  logs        LogFile[]
+}
+
+enum LogType {
+  INFO
+  ERROR
+  WARNING
+}
+
+model LogFile {
+  id        Int      @id @default(autoincrement())
+  message   String
+  type      LogType  @default(INFO)
+  createdAt DateTime @default(now())
+  file      File     @relation(fields: [fileId], references: [id])
+  fileId    Int
+}
