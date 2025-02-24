@@ -1,18 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { File, LogFile, Status } from '@prisma/client';
+import { Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-interface HistoryItem {
-  id: string;
-  fileName: string;
-  date: string;
-  status: 'success' | 'error';
-  errorMessage?: string;
-}
+import HistoryModal from './HistoryModal';
+import { Badge } from './ui/badge';
+
+export type HistoryType = File & {
+  logs: LogFile[];
+};
 
 export default function HistorySection() {
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [history, setHistory] = useState<HistoryType[]>([]);
+  const [selectedFile, setSelectedFile] = useState<HistoryType | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     fetchHistory();
@@ -22,7 +25,7 @@ export default function HistorySection() {
     try {
       const response = await fetch('/api/history');
       if (response.ok) {
-        const data = await response.json();
+        const data: Array<HistoryType> = await response.json();
         setHistory(data);
       }
     } catch (error) {
@@ -30,75 +33,99 @@ export default function HistorySection() {
     }
   };
 
-  const handleClearError = async (id: string) => {
-    try {
-      const response = await fetch(`/api/history/${id}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        setHistory(history.filter((item) => item.id !== id));
-      }
-    } catch (error) {
-      console.error('Erro ao limpar erro:', error);
+  function GetDate(input: Date) {
+    const date = new Date(input);
+
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      throw new Error('Data inválida!');
     }
-  };
+
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+
+    return new Intl.DateTimeFormat('pt-BR', options).format(date);
+  }
+
+  function ShowBadge(status: Status) {
+    switch (status) {
+      case 'SUCCESS':
+        return <Badge variant={'success'}>Sucesso</Badge>;
+      case 'ERROR':
+        return <Badge variant={'destructive'}>Erro</Badge>;
+      case 'PENDING':
+        return <Badge variant={'secondary'}>Pendente</Badge>;
+      case 'IN_PROGRESS':
+        return <Badge variant={'default'}>Processando</Badge>;
+    }
+  }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">Histórico de Uploads</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Arquivo
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Data
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ações
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {history.map((item) => (
-              <tr key={item.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {item.fileName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {item.date}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      item.status === 'success'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {item.status === 'success' ? 'Sucesso' : 'Erro'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {item.status === 'error' && (
-                    <button
-                      onClick={() => handleClearError(item.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  )}
-                </td>
+    <>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4">Histórico de Uploads</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Arquivo
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Criado em
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Ultima atualização
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Histórico
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {history.map((item) => (
+                <tr key={item.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {item.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {GetDate(item.createdAt)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {GetDate(item.updatedAt)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {ShowBadge(item.status)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center items-center">
+                    <div
+                      className="text-gray-500 p-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-300 hover:text-gray-600"
+                      onClick={() => setSelectedFile(item)}
+                    >
+                      <Search size={16} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+      <HistoryModal
+        file={selectedFile}
+        onClosed={function (): void {
+          setSelectedFile(undefined);
+        }}
+      />
+    </>
   );
 }

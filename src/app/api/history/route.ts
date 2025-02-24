@@ -1,3 +1,4 @@
+import { prisma } from "@/prisma"
 import { NextResponse } from "next/server"
 
 // Simulação de um banco de dados
@@ -18,7 +19,16 @@ const history = [
 ]
 
 export async function GET() {
-  return NextResponse.json(history)
+  const files = await prisma.file.findMany({
+    orderBy: {
+      id: "desc",
+    },
+    include: {
+      logs: true,
+    },
+  })
+
+  return NextResponse.json(files)
 }
 
 export async function POST(request: Request) {
