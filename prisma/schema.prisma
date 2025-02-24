@@ -21,9 +21,9 @@ enum FileType {
 
 model File {
   id          Int       @id @default(autoincrement())
-  type        FileType
+  type        FileType?
   name        String
-  currentPath String
+  currentPath String?
   status      Status    @default(PENDING)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -41,6 +41,6 @@ model LogFile {
   message   String
   type      LogType  @default(INFO)
   createdAt DateTime @default(now())
-  file      File     @relation(fields: [fileId], references: [id])
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   fileId    Int
 }

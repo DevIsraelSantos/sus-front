@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { Logger } from '../logger.class';
 import { ValidateColumnNames } from './columns';
+import { prisma } from '@/prisma';
 
 // 📌 Configuração para permitir uploads grandes
 export const config = {
@@ -21,46 +22,86 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
     }
 
-    const logger = new Logger(file.name);
-    logger.log('Iniciando processamento do arquivo');
 
-    logger.log('Criando caminho temporário para salvar o arquivo');
+    const fileinit = await prisma.file.create({
+      data: {
+        name: file.name,
+      }
+    })
+
+    const logger = new Logger(fileinit.id);
+    await logger.log(`Inicio do processamento do arquivo ${file.name}`);
+
+    // Inicia o processo de upload
     const tempDir = path.join(process.cwd(), 'public', 'temp');
     await fs.mkdir(tempDir, { recursive: true });
-    logger.log(`Caminho temporário criado com sucesso: ${tempDir}`);
+    const tempFilePath = path.join(tempDir, fileinit.id.toString() + '.dbf');
 
-    const tempFilePath = path.join(tempDir, file.name);
-    logger.log(`Caminho do arquivo temporário: ${tempFilePath}`);
+    // Lê o arquivo em memória e salva no disco
+    await logger.log('Salvando o arquivo na pasta temporária');
     const buffer = Buffer.from(await file.arrayBuffer());
-
-    logger.log('Escrevendo o arquivo no disco');
     await fs.writeFile(tempFilePath, buffer);
-    logger.log('Arquivo salvo com sucesso');
+    await prisma.file.update({
+      where: {
+        id: fileinit.id
+      },
+      data: {
+        currentPath: tempFilePath
+      }
+    })
+    await logger.log('Arquivo salvo com sucesso');
 
-    logger.log('Abrindo o arquivo DBF');
+    // Valida colunas do arquivo
+    await logger.log('Inicio da validação das colunas do arquivo');
     const dbf = await DBFFile.open(tempFilePath);
-    logger.log('Arquivo DBF aberto com sucesso');
+    await logger.log('Arquivo DBF aberto com sucesso');
     const fieldsInfo = dbf.fields.map((field) => field.name.toLowerCase());
     const fileType = await ValidateColumnNames(fieldsInfo);
-    if(fileType === 'ERRO') {
-      logger.log('Tipo de arquivo não reconhecido');
-      logger.log('Removendo arquivo temporário');
+    await logger.log(`O arquivo possui ${fieldsInfo.length} colunas. considerado ${fileType}`);
+
+    if (fileType === 'ERRO') {
+      await logger.log('Removendo arquivo temporário');
       await fs.rm(tempFilePath);
-      logger.log('Arquivo removido com sucesso');
+      await prisma.file.update({
+        where: {
+          id: fileinit.id
+        },
+        data: {
+          currentPath: null,
+          status: 'ERROR'
+        }
+      })
+      await logger.warn('Arquivo removido com sucesso');
+      await logger.error('Tipo de arquivo não reconhecido');
       return NextResponse.json({ error: 'Tipo de arquivo não reconhecido, verifica as colunas' }, { status: 400 });
+    } else {
+      await prisma.file.update({
+        where: {
+          id: fileinit.id
+        },
+        data: {
+          type: fileType
+        }
+      })
     }
-    logger.log(`Tipo de arquivo identificado: ${fileType}`);
+    await logger.log(`Tipo de arquivo identificado: ${fileType}`);
 
-    const destinationFolder = 'awaiting_upload';
-    logger.log(`Pasta de destino: ${destinationFolder}`);
-
-    const finalDir = path.join(process.cwd(), 'public', destinationFolder);
+    // Move o arquivo para a pasta de espera
+    await logger.log(`Movendo o arquivo para a pasta de espera`);
+    const finalDir = path.join(process.cwd(), 'public', 'files', 'pending');
     await fs.mkdir(finalDir, { recursive: true });
 
-    const finalPath = path.join(finalDir, file.name);
-    logger.log(`Movendo o arquivo para ${finalPath}`);
+    const finalPath = path.join(finalDir, fileinit.id.toString() + '.dbf');
     await fs.rename(tempFilePath, finalPath);
-    logger.log('Arquivo movido com sucesso');
+    await prisma.file.update({
+      where: {
+        id: fileinit.id
+      },
+      data: {
+        currentPath: finalPath
+      }
+    })
+    await logger.log('Arquivo movido com sucesso');
 
     return NextResponse.json(
       { message: `Arquivo salvo em /public/${finalPath}` },
