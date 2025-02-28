@@ -85,9 +85,11 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
                   </button>
                 </Dialog.Title>
                 <div className="mt-2">
-                  <p className="text-sm text-gray-500">
-                    Arquivo {file.type}. Nome: {file.name}
-                  </p>
+                  <div className="text-sm text-gray-500 border-b border-gray-200 pb-2 inline-flex items-center w-full justify-start gap-1">
+                    <span>{'Arquivo'}</span>
+                    <Badge variant={'warning'}>{file.type}</Badge>
+                    <span>{`Nome: ${file.name}`}</span>
+                  </div>
 
                   <ScrollArea className="space-y-4 my-1 max-h-96 overflow-y-auto">
                     {file.logs.map((log) => (
