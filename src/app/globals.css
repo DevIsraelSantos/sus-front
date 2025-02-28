@@ -127,3 +127,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+@utility b-r {
+  border: 1px solid red;
+}

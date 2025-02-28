@@ -93,9 +93,11 @@ export default function HistorySection({
 
   return (
     <>
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-muted/50 p-6 rounded-lg shadow-md">
         <div className="inline-flex justify-between w-full">
-          <h2 className="text-2xl font-semibold mb-4">Histórico de Uploads</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-primary">
+            Histórico de Uploads
+          </h2>
           <Button
             size={'sm'}
             variant={'outline'}
@@ -108,43 +110,43 @@ export default function HistorySection({
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/60">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">
                   Arquivo
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">
                   Criado em
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">
                   Ultima atualização
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider">
                   Histórico
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-muted divide-y divide-gray-200">
               {history.map((item) => (
                 <tr key={item.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">
                     {item.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
                     {GetDate(item.createdAt)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
                     {GetDate(item.updatedAt)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
                     {ShowBadge(item.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center items-center">
                     <div
-                      className="text-gray-500 p-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-300 hover:text-gray-600"
+                      className="text-primary p-2 rounded-full cursor-pointer bg-background hover:bg-gray-300 hover:text-gray-600"
                       onClick={() => setSelectedFile(item)}
                     >
                       <Search size={16} />

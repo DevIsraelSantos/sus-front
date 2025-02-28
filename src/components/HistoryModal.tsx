@@ -6,6 +6,7 @@ import { Fragment } from 'react';
 import { HistoryType } from './HistorySection';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
+import { Button } from './ui/button';
 
 interface HistoryModalProps {
   file: HistoryType | undefined;
@@ -71,10 +72,10 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-muted/90 p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900 flex justify-between items-center"
+                  className="text-lg font-medium leading-6 text-primary flex justify-between items-center"
                 >
                   Histórico do Arquivo: {file.id}
                   <button
@@ -85,7 +86,7 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
                   </button>
                 </Dialog.Title>
                 <div className="mt-2">
-                  <div className="text-sm text-gray-500 border-b border-gray-200 pb-2 inline-flex items-center w-full justify-start gap-1">
+                  <div className="text-sm text-primary/75 border-b border-gray-200 pb-2 inline-flex items-center w-full justify-start gap-1">
                     <span>{'Arquivo'}</span>
                     <Badge variant={file.type ? 'warning' : 'destructive'}>
                       {file.type ?? 'ERRO'}
@@ -97,7 +98,7 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
                     {file.logs.map((log) => (
                       <div
                         key={log.id}
-                        className="flex justify-between items-center hover:bg-gray-50 mb-2"
+                        className="text-primary/70 flex justify-between items-center hover:bg-background/60 mb-2 p-1"
                       >
                         <div className="flex flex-col">
                           <p className="text-base">{log.message}</p>
@@ -112,13 +113,13 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
                 </div>
 
                 <div className="mt-4 flex justify-end space-x-2">
-                  <button
+                  <Button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
                     onClick={onClosed}
+                    variant={'secondary'}
                   >
                     Fechar
-                  </button>
+                  </Button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

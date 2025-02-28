@@ -61,7 +61,7 @@ export default function ConfirmationModal({
                   <p className="text-sm text-gray-500">
                     Você está prestes a fazer upload do seguinte arquivo:
                   </p>
-                  <ul className="mt-2 space-y-1">
+                  <ul className="mt-2 space-y-1 text-secondary">
                     <li className="text-sm font-medium">Nome: {file.name}</li>
                     <li className="text-sm">Tipo: {file.type}</li>
                     <li className="text-sm">
@@ -73,7 +73,7 @@ export default function ConfirmationModal({
                 <div className="mt-4 flex justify-end space-x-2">
                   <Button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    variant={'destructive'}
                     onClick={() => {
                       setIsLoaded(true);
                       onConfirm();
@@ -83,15 +83,15 @@ export default function ConfirmationModal({
                     {isLoaded && <Loader2 className="animate-spin" />}
                     Confirmar
                   </Button>
-                  <button
+                  <Button
                     type="button"
                     data-is-loading={isLoaded}
-                    className="data-is-loading:cursor-not-allowed inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+                    variant={'default'}
                     onClick={onCancel}
                     disabled={isLoaded}
                   >
                     Cancelar
-                  </button>
+                  </Button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

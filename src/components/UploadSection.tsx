@@ -79,8 +79,10 @@ export default function UploadSection({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">Upload de Arquivo DBF</h2>
+    <div className="bg-muted p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-4 text-primary">
+        Upload de Arquivo DBF
+      </h2>
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
@@ -94,7 +96,7 @@ export default function UploadSection({
         <p className="mt-2 text-sm text-gray-600">
           Arraste e solte um arquivo .DBF aqui, ou clique para selecionar
         </p>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-primary mt-1">
           Apenas arquivos .dbf são aceitos
         </p>
       </div>
