@@ -87,7 +87,9 @@ export default function HistoryModal({ file, onClosed }: HistoryModalProps) {
                 <div className="mt-2">
                   <div className="text-sm text-gray-500 border-b border-gray-200 pb-2 inline-flex items-center w-full justify-start gap-1">
                     <span>{'Arquivo'}</span>
-                    <Badge variant={'warning'}>{file.type}</Badge>
+                    <Badge variant={file.type ? 'warning' : 'destructive'}>
+                      {file.type ?? 'ERRO'}
+                    </Badge>
                     <span>{`Nome: ${file.name}`}</span>
                   </div>
 

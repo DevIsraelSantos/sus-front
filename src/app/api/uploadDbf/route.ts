@@ -59,12 +59,11 @@ export async function POST(req: NextRequest) {
     await logger.log('Arquivo DBF aberto com sucesso');
     const fieldsInfo = dbf.fields.map((field) => field.name.toLowerCase());
     const fileType = await ValidateColumnNames(fieldsInfo);
-    await logger.log(
-      `O arquivo possui ${fieldsInfo.length} colunas. considerado ${fileType}`
-    );
+    await logger.log(`O arquivo possui ${fieldsInfo.length} colunas`);
 
     if (fileType === 'ERRO') {
-      await logger.log('Removendo arquivo temporário');
+      await logger.error(`Arquivo foi considerado ${fileType}`);
+      await logger.warn('Removendo arquivo temporário');
       await fs.rm(tempFilePath);
       await prisma.file.update({
         where: {
@@ -75,13 +74,14 @@ export async function POST(req: NextRequest) {
           status: 'ERROR',
         },
       });
-      await logger.warn('Arquivo removido com sucesso');
+      await logger.log('Arquivo removido com sucesso');
       await logger.error('Tipo de arquivo não reconhecido');
       return NextResponse.json(
         { error: 'Tipo de arquivo não reconhecido, verifica as colunas' },
         { status: 400 }
       );
     } else {
+      await logger.log(`Arquivo foi considerado ${fileType}`);
       await prisma.file.update({
         where: {
           id: fileinit.id,
